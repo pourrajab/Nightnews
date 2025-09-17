@@ -12,6 +12,10 @@ A dynamic news content management system built with NestJS, TypeORM, and Postgre
 - **API Documentation**: Swagger
 - **File Upload**: Multer
 
+## 🔐 .env
+
+env.example
+
 ## 📚 Available Scripts
 
 - `npm run start:dev` - Start development server

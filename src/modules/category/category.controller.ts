@@ -1,22 +1,9 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Query,
-  ParseIntPipe,
-  UseGuards,
-} from "@nestjs/common";
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGuards } from "@nestjs/common";
 import { CategoryService } from "./category.service";
 import { CreateCategoryDto } from "./dto/create-category.dto";
 import { UpdateCategoryDto } from "./dto/update-category.dto";
-import { ApiConsumes, ApiQuery, ApiTags, ApiBearerAuth } from "@nestjs/swagger";
+import { ApiConsumes, ApiTags, ApiBearerAuth } from "@nestjs/swagger";
 import { SwaggerConsumes } from "src/common/enums/swagger-consumes.enum";
-import { PaginationDto } from "src/common/dtos/pagination.dto";
-import { Pagination } from "src/common/decorators/pagination.decorator";
 import { AuthGuard } from "../auth/guards/auth.guard";
 import { RoleGuard } from "../auth/guards/role.guard";
 import { CanAccess } from "src/common/decorators/role.decorator";
@@ -53,10 +40,7 @@ export class CategoryController {
   @ApiBearerAuth()
   @CanAccess(Roles.Admin)
   @ApiConsumes(SwaggerConsumes.UrlEncoded, SwaggerConsumes.Json)
-  update(
-    @Param("id", ParseIntPipe) id: number,
-    @Body() updateCategoryDto: UpdateCategoryDto
-  ) {
+  update(@Param("id", ParseIntPipe) id: number, @Body() updateCategoryDto: UpdateCategoryDto) {
     return this.categoryService.update(id, updateCategoryDto);
   }
 

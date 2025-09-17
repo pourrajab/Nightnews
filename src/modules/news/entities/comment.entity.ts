@@ -1,15 +1,7 @@
 import { BaseEntity } from "src/common/abstracts/base.entity";
 import { EntityName } from "src/common/enums/entity.enum";
 import { UserEntity } from "src/modules/user/entities/user.entity";
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
-  RelationId,
-} from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
 import { NewsEntity } from "./news.entity";
 
 @Entity(EntityName.NewsComments)

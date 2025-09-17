@@ -14,7 +14,6 @@ import { Repository } from "typeorm";
 import { ProfileEntity } from "./entities/profile.entity";
 import { REQUEST } from "@nestjs/core";
 import { Request } from "express";
-import { isDate } from "class-validator";
 import { Gender } from "./enum/gender.enum";
 import { ProfileImages } from "./types/files";
 import {
@@ -29,12 +28,8 @@ import { AuthService } from "../auth/auth.service";
 import { TokenService } from "../auth/tokens.service";
 import { CookieKeys } from "src/common/enums/cookie.enum";
 import { AuthMethod } from "../auth/enums/method.enum";
-import { EntityName } from "src/common/enums/entity.enum";
 import { PaginationDto } from "src/common/dtos/pagination.dto";
-import {
-  paginationGenerator,
-  paginationSolver,
-} from "src/common/utils/pagination.util";
+import { paginationGenerator, paginationSolver } from "src/common/utils/pagination.util";
 import { UserBlockDto } from "../auth/dto/auth.dto";
 import { UserStatus } from "./enum/status.enum";
 import * as bcrypt from "bcrypt";
@@ -65,26 +60,16 @@ export class UserService {
     const { id: userId, profileId } = this.request.user;
 
     let profile = await this.profileRepository.findOneBy({ userId });
-    const {
-      bio,
-      birthday,
-      gender,
-      linkedin_profile,
-      nick_name,
-      x_profile,
-      image_profile,
-      bg_image,
-    } = profileDto;
+    const { bio, birthday, gender, linkedin_profile, nick_name, x_profile, image_profile, bg_image } =
+      profileDto;
 
-    const hasValidBirthday =
-      birthday && !isNaN(Date.parse(birthday as unknown as string));
+    const hasValidBirthday = birthday && !isNaN(Date.parse(birthday as unknown as string));
 
     if (profile) {
       if (nick_name) profile.nick_name = nick_name;
       if (bio) profile.bio = bio;
       if (hasValidBirthday) profile.birthday = new Date(birthday);
-      if (gender && Object.values(Gender).includes(gender as Gender))
-        profile.gender = gender;
+      if (gender && Object.values(Gender).includes(gender as Gender)) profile.gender = gender;
       if (linkedin_profile) profile.linkedin_profile = linkedin_profile;
       if (x_profile) profile.x_profile = x_profile;
       if (image_profile) profile.image_profile = image_profile;
@@ -105,10 +90,7 @@ export class UserService {
     }
     profile = await this.profileRepository.save(profile);
     if (!profileId) {
-      await this.userRepository.update(
-        { id: userId },
-        { profileId: profile.id }
-      );
+      await this.userRepository.update({ id: userId }, { profileId: profile.id });
     }
     return {
       message: PublicMessage.Updated,
@@ -128,7 +110,7 @@ export class UserService {
   }
 
   async profile() {
-    const {id} =  this.request.user
+    const { id } = this.request.user;
     if (!id) {
       throw new UnauthorizedException(AuthMessage.LoginIsRequired);
     }
@@ -242,8 +224,7 @@ export class UserService {
   async changePassword(body: ChangePasswordDto) {
     const { id } = this.request.user;
     const user = await this.userRepository.findOneBy({ id });
-    if (!user || !user.password)
-      throw new BadRequestException(BadRequestMessage.SomeThingWrong);
+    if (!user || !user.password) throw new BadRequestException(BadRequestMessage.SomeThingWrong);
     const ok = await bcrypt.compare(body.currentPassword, user.password);
     if (!ok) throw new BadRequestException(BadRequestMessage.SomeThingWrong);
     const hash = await bcrypt.hash(body.newPassword, 12);
@@ -265,8 +246,7 @@ export class UserService {
     const otp = await this.otpRepository.findOneBy({ userId });
     if (!otp) throw new BadRequestException(NotFoundMessage.NotFound);
     const now = new Date();
-    if (otp.expiresIn < now)
-      throw new BadRequestException(AuthMessage.ExpiredCode);
+    if (otp.expiresIn < now) throw new BadRequestException(AuthMessage.ExpiredCode);
     if (otp.code !== code) throw new BadRequestException(AuthMessage.TryAgain);
     return otp;
   }
@@ -280,10 +260,7 @@ export class UserService {
       message = PublicMessage.UnBlocked;
       await this.userRepository.update({ id: userId }, { status: null });
     } else {
-      await this.userRepository.update(
-        { id: userId },
-        { status: UserStatus.Block }
-      );
+      await this.userRepository.update({ id: userId }, { status: UserStatus.Block });
     }
     return {
       message,

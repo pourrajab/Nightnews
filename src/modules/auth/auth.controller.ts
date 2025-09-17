@@ -1,23 +1,12 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Req,
-  Res,
-  UseGuards,
-} from "@nestjs/common";
+import { Body, Controller, Get, Post, Req, Res } from "@nestjs/common";
 import { AuthService } from "./auth.service";
-import { ApiBearerAuth, ApiConsumes, ApiTags } from "@nestjs/swagger";
+import { ApiConsumes, ApiTags } from "@nestjs/swagger";
 import { AuthDto, CheckOtpDto } from "./dto/auth.dto";
 import { PasswordLoginDto, PasswordRegisterDto } from "./dto/password.dto";
 import { Throttle } from "@nestjs/throttler";
 import { SwaggerConsumes } from "src/common/enums/swagger-consumes.enum";
 import { Request, Response } from "express";
-import { AuthGuard } from "./guards/auth.guard";
 import { AuthDecorator } from "src/common/decorators/auth.decorator";
-import { CanAccess } from "src/common/decorators/role.decorator";
-import { Roles } from "src/common/enums/role.enum";
 
 @Controller("auth")
 @ApiTags("Auth")
@@ -57,7 +46,7 @@ export class AuthController {
   @Post("login-password")
   @ApiConsumes(SwaggerConsumes.UrlEncoded, SwaggerConsumes.Json)
   @Throttle({ default: { ttl: 60_000, limit: 10 } })
-  loginWithPassword(@Body() body: PasswordLoginDto, ) {
+  loginWithPassword(@Body() body: PasswordLoginDto) {
     return this.authService.loginWithPassword(body);
   }
 

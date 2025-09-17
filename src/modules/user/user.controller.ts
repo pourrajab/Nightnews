@@ -1,40 +1,10 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  ParseFilePipe,
-  ParseIntPipe,
-  Patch,
-  Post,
-  Put,
-  Query,
-  Req,
-  Res,
-  UploadedFiles,
-  UseGuards,
-  UseInterceptors,
-} from "@nestjs/common";
+import { Body, Controller, Get, Patch, Post, Put, Query, Res, UseInterceptors } from "@nestjs/common";
 import { UserService } from "./user.service";
-import { ApiBearerAuth, ApiConsumes, ApiParam, ApiTags } from "@nestjs/swagger";
-import {
-  ChangeEmailDto,
-  ChangePhoneDto,
-  ChangeUsernameDto,
-  ProfileDto,
-} from "./dto/profile.dto";
+import { ApiConsumes, ApiTags } from "@nestjs/swagger";
+import { ChangeEmailDto, ChangePhoneDto, ChangeUsernameDto, ProfileDto } from "./dto/profile.dto";
 import { SwaggerConsumes } from "src/common/enums/swagger-consumes.enum";
-import {
-  FileFieldsInterceptor,
-  FileInterceptor,
-} from "@nestjs/platform-express";
-import { diskStorage } from "multer";
-import {
-  multerDestination,
-  multerFilename,
-  multerStorage,
-} from "src/common/utils/multer.util";
-import { AuthGuard } from "../auth/guards/auth.guard";
+import { FileFieldsInterceptor } from "@nestjs/platform-express";
+import { multerStorage } from "src/common/utils/multer.util";
 import { ProfileImages } from "./types/files";
 import { UploadedOptionalFiles } from "src/common/decorators/upload-file.decorator";
 import { Response } from "express";
@@ -48,7 +18,6 @@ import { PaginationDto } from "src/common/dtos/pagination.dto";
 import { CanAccess } from "src/common/decorators/role.decorator";
 import { Roles } from "src/common/enums/role.enum";
 import { ChangePasswordDto, UpdateUserRoleDto } from "./dto/password.dto";
-import { AuthGuard as PasswordAuthGuard } from "../auth/guards/auth.guard";
 
 @Controller("user")
 @ApiTags("User")
@@ -69,10 +38,7 @@ export class UserController {
       }
     )
   )
-  changeProfile(
-    @UploadedOptionalFiles() files: ProfileImages,
-    @Body() profileDto: ProfileDto
-  ) {
+  changeProfile(@UploadedOptionalFiles() files: ProfileImages, @Body() profileDto: ProfileDto) {
     return this.userService.changeProfile(files, profileDto);
   }
   @Get("/profile")
@@ -88,9 +54,7 @@ export class UserController {
   @Patch("/change-email")
   @ApiConsumes(SwaggerConsumes.UrlEncoded, SwaggerConsumes.Json)
   async changeEmail(@Body() emailDto: ChangeEmailDto, @Res() res: Response) {
-    const { code, token, message } = await this.userService.changeEmail(
-      emailDto.email
-    );
+    const { code, token, message } = await this.userService.changeEmail(emailDto.email);
     if (message) return res.json({ message });
     res.cookie(CookieKeys.EmailOTP, token, CookiesOptionsToken());
     res.json({
@@ -106,9 +70,7 @@ export class UserController {
   @Patch("/change-phone")
   @ApiConsumes(SwaggerConsumes.UrlEncoded, SwaggerConsumes.Json)
   async changePhone(@Body() phoneDto: ChangePhoneDto, @Res() res: Response) {
-    const { code, token, message } = await this.userService.changePhone(
-      phoneDto.phone
-    );
+    const { code, token, message } = await this.userService.changePhone(phoneDto.phone);
     if (message) return res.json({ message });
     res.cookie(CookieKeys.PhoneOTP, token, CookiesOptionsToken());
     res.json({
